@@ -13,6 +13,7 @@ import torch.nn.parallel
 import torch.backends.cudnn as cudnn
 import torch.optim
 from tqdm import tqdm
+import skimage.io
 
 from ofa.utils import get_net_info, cross_entropy_loss_with_soft_target, cross_entropy_with_label_smoothing, aanet_loss
 from ofa.utils import AverageMeter, accuracy, write_log, mix_images, mix_labels, init_models
@@ -242,6 +243,7 @@ class RunManager:
                     # compute output
                     pred_disp_pyramid = self.net(left, right)  # list of H/12, H/6, H/3, H/2, H
                     pred_disp = pred_disp_pyramid[-1]
+                    
                     mask = (gt_disp > 0) & (gt_disp < 192)
 
                     loss = self.test_criterion(pred_disp_pyramid, gt_disp, mask)
@@ -255,6 +257,7 @@ class RunManager:
                             'img_size': left.size(2),
                         })
                     t.update(1)
+
         return losses.avg, self.get_metric_vals(metric_dict)
 
     def validate_all_resolution(self, epoch=0, is_test=False, net=None):

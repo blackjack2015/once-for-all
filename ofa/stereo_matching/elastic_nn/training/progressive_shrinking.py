@@ -44,20 +44,35 @@ def validate(run_manager, epoch=0, is_test=False, image_size_list=None,
             width_mult_list = [0]
 
     subnet_settings = []
-    for d in depth_list:
-        for e in expand_ratio_list:
-            for k in ks_list:
-                for s in scale_list:
-                    for w in width_mult_list:
-                        for img_size in image_size_list:
-                            subnet_settings.append([{
-                                'image_size': img_size,
-                                'd': d,
-                                'e': e,
-                                'ks': k,
-                                's': s,
-                                'w': w,
-                            }, 'R%s-D%s-E%s-K%s-S%s-W%s' % (img_size, d, e, k, s, w)])
+    ds = [4, 2, 2]
+    es = [8, 8, 2]
+    ks = [7, 7, 3]
+    ss = [4, 2, 2]
+    img_size = 224
+    w = 0
+    for d,e,k,s in zip(ds,es,ks,ss):
+        subnet_settings.append([{
+            'image_size': img_size,
+            'd': d,
+            'e': e,
+            'ks': k,
+            's': s,
+            'w': w,
+        }, 'R%s-D%s-E%s-K%s-S%s-W%s' % (img_size, d, e, k, s, w)])
+    #for d in depth_list:
+    #    for e in expand_ratio_list:
+    #        for k in ks_list:
+    #            for s in scale_list:
+    #                for w in width_mult_list:
+    #                    for img_size in image_size_list:
+    #                        subnet_settings.append([{
+    #                            'image_size': img_size,
+    #                            'd': d,
+    #                            'e': e,
+    #                            'ks': k,
+    #                            's': s,
+    #                            'w': w,
+    #                        }, 'R%s-D%s-E%s-K%s-S%s-W%s' % (img_size, d, e, k, s, w)])
     if additional_setting is not None:
         subnet_settings += additional_setting
 

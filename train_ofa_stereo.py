@@ -20,12 +20,13 @@ from ofa.stereo_matching.elastic_nn.training.progressive_shrinking import load_m
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--task', type=str, default='large', choices=[
-    'kernel', 'depth', 'expand', 'scale', 'large', 'final'
+    'kernel', 'depth', 'expand', 'scale', 'large', 'final', 'kitti2012', 'kitti2015', 'kitti'
 ])
 parser.add_argument('--phase', type=int, default=1, choices=[1, 2])
 parser.add_argument('--resume', action='store_true')
 
 args = parser.parse_args()
+args.dataname = 'SceneFlow'
 if args.task == 'large':
     args.path = 'exp/normal'
     args.dynamic_batch_size = 1
@@ -165,14 +166,29 @@ elif args.task == 'final': # extremely small network
     args.expand_list = '2,4,6,8'
     args.depth_list = '2,3,4'
     args.scale_list = '2,3,4'
+elif args.task in ['kitti', 'kitti2012', 'kitti2015']: # finetune on kitti
+    args.path = 'exp/%s' % args.task
+    args.dynamic_batch_size = 6
+    args.n_epochs = 1200
+    args.base_lr = 1e-3
+    args.warmup_epochs = 0
+    args.warmup_lr = -1
+    args.ks_list = '3,5,7'
+    args.expand_list = '2,4,6,8'
+    args.depth_list = '2,3,4'
+    args.scale_list = '2,3,4'
+    args.datapath = '/datasets/' + args.task
+    args.dataname = args.task.upper()
+    from ofa.stereo_matching.data_providers.stereo import StereoDataProvider
+    StereoDataProvider.DEFAULT_PATH = args.datapath
 else:
     raise NotImplementedError
 args.manual_seed = 0
 
 #args.lr_schedule_type = 'cosine'
-args.lr_schedule_type = 'multistep-10-0.5'
+args.lr_schedule_type = 'multistep-300-0.5'
 
-args.base_batch_size = 2
+args.base_batch_size = 4
 args.valid_size = None
 
 args.opt_type = 'adam'
@@ -354,6 +370,10 @@ if __name__ == '__main__':
             args.ofa_checkpoint_path = 'ofa_stereo_checkpoints/ofa_stereo_D234_E2468_K357_S4'
         if args.task == 'final':
             args.ofa_checkpoint_path = 'ofa_stereo_checkpoints/ofa_stereo_D234_E2468_K357_S234'
+        train_elastic_scale(train, distributed_run_manager, args, validate_func_dict)
+    elif (args.task in ['kitti2012', 'kitti2015', 'kitti']):
+        from ofa.stereo_matching.elastic_nn.training.progressive_shrinking import train_elastic_scale
+        args.ofa_checkpoint_path = 'ofa_stereo_checkpoints/final'
         train_elastic_scale(train, distributed_run_manager, args, validate_func_dict)
     else:
         raise NotImplementedError

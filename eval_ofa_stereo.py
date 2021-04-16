@@ -66,7 +66,7 @@ print("Data:", args.dataset)
 run_config = StereoRunConfig(test_batch_size=args.batch_size, n_worker=args.workers, dataname=args.dataset)
 
 #model_file = 'ofa_stereo_checkpoints/ofa_stereo_D4_E8_K7_S4'
-model_file = 'ofa_stereo_checkpoints/final'
+model_file = 'ofa_stereo_checkpoints/kitti2012'
 init = torch.load(model_file, map_location='cpu')
 model_dict = init['state_dict']
 ofa_network.load_state_dict(model_dict)
