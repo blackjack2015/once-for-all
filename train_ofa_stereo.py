@@ -170,7 +170,10 @@ elif args.task in ['kitti', 'kitti2012', 'kitti2015']: # finetune on kitti
     args.path = 'exp/%s' % args.task
     args.dynamic_batch_size = 6
     args.n_epochs = 1200
-    args.base_lr = 1e-3
+    if args.task == 'kitti':
+        args.base_lr = 1e-3
+    else:
+        args.base_lr = 1e-4
     args.warmup_epochs = 0
     args.warmup_lr = -1
     args.ks_list = '3,5,7'
@@ -188,7 +191,7 @@ args.manual_seed = 0
 #args.lr_schedule_type = 'cosine'
 args.lr_schedule_type = 'multistep-300-0.5'
 
-args.base_batch_size = 4
+args.base_batch_size = 2
 args.valid_size = None
 
 args.opt_type = 'adam'
