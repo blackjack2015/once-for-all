@@ -6,7 +6,7 @@ import numpy as np
 import re
 from PIL import Image
 import sys
-
+import skimage.io
 
 def read_img(filename):
     # Convert to RGB for scene flow finalpass data
@@ -112,3 +112,8 @@ def _read_kitti_disp(filename):
     depth = np.array(Image.open(filename))
     depth = depth.astype(np.float32) / 256.
     return depth
+
+if __name__ == '__main__':
+    disp = read_disp('0094.pfm')
+    disp = np.round(disp*256.)
+    skimage.io.imsave('0094.png', disp.astype('uint16'))

@@ -122,11 +122,6 @@ class StereoDataset(Dataset):
         if sample_path['pseudo_disp'] is not None:
             sample['pseudo_disp'] = read_disp(sample_path['pseudo_disp'], subset=subset)  # [H, W]
 
-        if self.transform is not None:
-            sample = self.transform(sample)
-
-        sample['disp_name'] = sample_path['left']
-
         # padding for KITTI
         h, w, _ = sample['left'].shape
         top_pad = 384-h
@@ -135,6 +130,11 @@ class StereoDataset(Dataset):
             sample['left'] = np.lib.pad(sample['left'],((top_pad,0),(left_pad,0),(0,0)),mode='constant',constant_values=0)
             sample['right'] = np.lib.pad(sample['right'],((top_pad,0),(left_pad,0),(0,0)),mode='constant',constant_values=0)
             sample['disp'] = np.lib.pad(sample['disp'],((top_pad,0),(left_pad,0)),mode='constant',constant_values=0)
+
+        if self.transform is not None:
+            sample = self.transform(sample)
+
+        sample['disp_name'] = sample_path['left']
 
         return sample
 
